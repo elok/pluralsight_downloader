@@ -1,38 +1,24 @@
-import mechanize
-import cookielib
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
-def run(url):
-    # Browser
-    br = mechanize.Browser()
+password = None
 
-    # Cookie Jar
-    cj = cookielib.LWPCookieJar()
-    br.set_cookiejar(cj)
+driver = webdriver.Chrome()
+driver.get("https://app.pluralsight.com/library/courses/raspberry-pi-home-server/table-of-contents")
 
-    # Browser options
-    br.set_handle_equiv(True)
-    br.set_handle_gzip(True)
-    br.set_handle_redirect(True)
-    br.set_handle_referer(True)
-    br.set_handle_robots(False)
+elem = driver.find_element_by_name('Username')
+elem.send_keys('ericlok@gmail.com')
 
-    # Follows refresh 0 but not hangs on refresh > 0
-    br.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
+elem = driver.find_element_by_name('Password')
+elem.send_keys(password)
 
-    # Want debugging messages?
-    # br.set_debug_http(True)
-    # br.set_debug_redirects(True)
-    # br.set_debug_responses(True)
+elem = driver.find_element_by_id('login')
+elem.click()
 
-    # User-Agent (this is cheating, ok?)
-    br.addheaders = [('User-agent',
-                      'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
+link_list = driver.find_elements_by_class_name('table-of-contents__clip-list-title')
 
-    # Open some site, let's pick a random one, the first that pops in mind:
-    r = br.open('http://google.com')
-    html = r.read()
+for link in link_list:
+    link_str = str(link.get_attribute('href'))
+    print link_str
 
-if __name__ == '__main__':
-
-    url = 'https://app.pluralsight.com/library/courses/lean-software-development-fundamentals/table-of-contents'
-    run(url)
+driver.close()
